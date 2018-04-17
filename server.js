@@ -7,6 +7,7 @@ console.log('Hello Noteful!');
 
 //import express
 const express = require('express');
+const {PORT} = require('./config');
 
 //init epress app
 const app = express();
@@ -34,7 +35,7 @@ app.get('/api/notes/:id',(req, res) => {
 });
 
 
-app.listen(8080, function(){
+app.listen(PORT, function(){
   console.info(`Server is listining on ${this.address().port}`);
 }).on('error', err => {
   console.error(err);
