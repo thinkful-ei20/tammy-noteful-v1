@@ -35,11 +35,16 @@ app.get('/api/notes/:id',(req, res) => {
   let id = req.params.id;
   console.log("The id is", id);
   let returnNote = data.find(item => item.id === Number(id));
-  if (!returnNote) {
-    return res.status(404).json({message: 'Not Found'});
-  }
+  // if (!returnNote) {
+  //   return res.status(404).json({message: 'Not Found'});
+  // }
   res.json(returnNote);
 });
+
+app.get('/boom', (req, res, next) => {
+  throw new Error('Boom!!');
+});
+
 
 app.use(function (req, res, next) {
   let err = new Error('Not Found');
@@ -55,9 +60,6 @@ app.use(function (err, req, res, next) {
   });
 });
 
-app.get('/boom', (req, res, next) => {
-  throw new Error('Boom!!');
-});
 
 app.listen(PORT, function(){
   console.info(`Server is listining on ${this.address().port}`);
