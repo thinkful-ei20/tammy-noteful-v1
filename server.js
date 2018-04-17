@@ -1,5 +1,7 @@
 'use strict';
 const data = require('./db/notes');
+const simDB = require('./db/simDB'); 
+const notes = simDB.initialize(data);  
 
 console.log('Hello Noteful!');
 
@@ -24,27 +26,37 @@ app.use(requestLogger);
 //   res.json(data);
 // });
 
-app.get('/api/notes',(req, res) => {
-  let searchTerm = req.query.searchTerm;
-  console.log("The search term is", searchTerm);
-  let filteredData = data.filter(item => item.title.includes(searchTerm));
-  res.json(filteredData);
+// app.get('/api/notes',(req, res) => {
+//   let searchTerm = req.query.searchTerm;
+//   console.log("The search term is", searchTerm);
+//   let filteredData = data.filter(item => item.title.includes(searchTerm));
+//   res.json(filteredData);
+// });
+
+app.get('/api/notes', (req, res, next) => {
+  const {searchTerm} = req.query;
+
+  notes.filter(searchTerm, (err, list) => {
+    if (err) {
+      return next(err); // goes to error handler
+    }
+    res.json(list); // responds with filtered array
+  });
 });
 
-app.get('/api/notes/:id',(req, res) => {
+app.get('/api/notes/:id',(req, res,next) => {
   let id = req.params.id;
-  console.log("The id is", id);
-  let returnNote = data.find(item => item.id === Number(id));
-  // if (!returnNote) {
-  //   return res.status(404).json({message: 'Not Found'});
-  // }
-  res.json(returnNote);
+  id = Number(id);
+  console.log('The id is', id);
+  notes.find(id, (err, returnNote) => {
+    res.json(returnNote);
+    //res.status(404).json({message: 'Not Found'}); }
+  });
 });
 
 app.get('/boom', (req, res, next) => {
   throw new Error('Boom!!');
 });
-
 
 app.use(function (req, res, next) {
   let err = new Error('Not Found');
