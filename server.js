@@ -18,20 +18,9 @@ const app = express();
 //retrieve static assets in public
 app.use(express.static('public'));
 
+app.use(express.json());
 
 app.use(requestLogger);
-
-
-// app.get('/api/notes/',(req, res) => {
-//   res.json(data);
-// });
-
-// app.get('/api/notes',(req, res) => {
-//   let searchTerm = req.query.searchTerm;
-//   console.log("The search term is", searchTerm);
-//   let filteredData = data.filter(item => item.title.includes(searchTerm));
-//   res.json(filteredData);
-// });
 
 app.get('/api/notes', (req, res, next) => {
   const {searchTerm} = req.query;
@@ -51,6 +40,32 @@ app.get('/api/notes/:id',(req, res,next) => {
   notes.find(id, (err, returnNote) => {
     res.json(returnNote);
     //res.status(404).json({message: 'Not Found'}); }
+  });
+});
+
+
+app.put('/api/notes/:id', (req, res, next) => {
+  const id = req.params.id;
+
+  /***** Never trust users - validate input *****/
+  const updateObj = {};
+  const updateFields = ['title', 'content'];
+
+  updateFields.forEach(field => {
+    if (field in req.body) {
+      updateObj[field] = req.body[field];
+    }
+  });
+
+  notes.update(id, updateObj, (err, item) => {
+    if (err) {
+      return next(err);
+    }
+    if (item) {
+      res.json(item);
+    } else {
+      next();
+    }
   });
 });
 
