@@ -43,6 +43,11 @@ const simDB = {
     setTimeout(() => {
       try {
         id = Number(id);
+        // if (isNaN(id)) {
+        //   throw 'not a valid ID';
+        // }
+  
+        console.log(id);
         let item = this.data.find(item => item.id === id);
         callback(null, item);
       } catch (err) {

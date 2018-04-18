@@ -10,17 +10,21 @@ console.log('Hello Noteful!');
 //import express
 const express = require('express');
 const {PORT} = require('./config');
-const requestLogger = require('./middlewares/logger');
+const morgan = require('morgan');
 
 //init epress app
 const app = express();
 
+//log requests, must be placed before static so it can be captured into html
+app.use(morgan('common'));
+
 //retrieve static assets in public
 app.use(express.static('public'));
 
+//parse request body
 app.use(express.json());
 
-app.use(requestLogger);
+//get All data and search
 
 app.get('/api/notes', (req, res, next) => {
   const {searchTerm} = req.query;
@@ -35,11 +39,19 @@ app.get('/api/notes', (req, res, next) => {
 
 app.get('/api/notes/:id',(req, res,next) => {
   let id = req.params.id;
-  id = Number(id);
-  console.log('The id is', id);
+  // id = Number(id);
+  // console.log('The id is', id);
   notes.find(id, (err, returnNote) => {
-    res.json(returnNote);
-    //res.status(404).json({message: 'Not Found'}); }
+    if (!err) {
+      return next(err);
+    } 
+    if (returnNote) {
+      res.json(returnNote);
+    } else {
+      next(); //goes to 404
+    }
+    // res.status(404).json({message: err});
+    //res.status(404).json({message: 'Not Found'}); 
   });
 });
 
@@ -59,7 +71,7 @@ app.put('/api/notes/:id', (req, res, next) => {
 
   notes.update(id, updateObj, (err, item) => {
     if (err) {
-      return next(err);
+      return next(err); //looks for next function with err, our err handler at the bottom
     }
     if (item) {
       res.json(item);

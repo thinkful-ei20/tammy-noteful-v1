@@ -100,7 +100,7 @@ const noteful = (function () {
     handleNoteItemClick();
     handleNoteSearchSubmit();
     handleNoteFormSubmit();
-    handleNoteStartNewSubmit();
+    //handleNoteStartNewSubmit();
     handleNoteDeleteClick();
   }
 
