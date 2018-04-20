@@ -45,9 +45,12 @@ app.use(function (err, req, res, next) {
   });
 });
 
+if (require.main === module){
+  app.listen(PORT, function(){
+    console.info(`Server is listining on ${this.address().port}`);
+  }).on('error', err => {
+    console.error(err);
+  });
+}
 
-app.listen(PORT, function(){
-  console.info(`Server is listining on ${this.address().port}`);
-}).on('error', err => {
-  console.error(err);
-});
+module.exports = app;
