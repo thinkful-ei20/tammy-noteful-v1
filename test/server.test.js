@@ -131,19 +131,27 @@ describe('POST api/notes', function () {
         expect(res).to.have.status(201);
         expect(res).to.be.json;
         expect(res).to.have.header('location');
-        expect(res.body).to.be.a('object');
+        expect(res.body).to.be.an('object');
         
         expect(res.body).to.include.keys('id','title','content');
         expect(res.body.id).to.equal(1010);
         expect(res.body.title).to.equal(newPost.title);
-        expect(res.body).to.equal(newPost.content);
+        expect(res.body.content).to.equal(newPost.content);
       });
   });
 
-  // it('should create and return a new item with location header when provided valid data', function () {
-  //   const newPost = {
-  //     'content' : 'I don\'t have much to say',
-  //   };
-  // });
-  // done();
+  it('should create and return a new item with location header when provided valid data', function () {
+    const newPost = {
+      'content' : 'I don\'t have much to say',
+    };
+    return chai.request(app)
+      .post('/api/notes/')
+      .send(newPost)
+      .then(function (res) {
+        expect(res).to.have.status(400);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.message).to.equal('Missing `title` in request body');
+      });
+  });
 });

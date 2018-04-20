@@ -53,27 +53,30 @@ router.put('/notes/:id', (req, res, next) => {
 
   /***** Never trust users - validate input *****/
   const updateObj = {};
-  const updateFields = ['title', 'content'];
+  const updateableFields = ['title', 'content'];
 
-  updateFields.forEach(field => {
+  updateableFields.forEach(field => {
     if (field in req.body) {
       updateObj[field] = req.body[field];
     }
   });
 
+  /***** Never trust users - validate input *****/
+  if (!updateObj.title) {
+    const err = new Error('Missing `title` in request body');
+    err.status = 400;
+    return next(err);
+  }
+
   notes.update(id, updateObj)
     .then(item => {
       if (item) {
-        (item => {
-          res.json(item);
-        });
+        res.json(item);
       } else {
         next();
       }
     })
-    .catch (err => {
-      next(err); //looks for next function with err, our err handler at the bottom
-    });
+    .catch(err => next(err));
 });
 
 router.post('/notes', (req, res, next) => {
@@ -90,20 +93,13 @@ router.post('/notes', (req, res, next) => {
   notes.create(newItem)
     .then (item => {
       if (item) {
-        (item => {
-          res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
-        });
-      } else {
-        next();
+        res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
       }
     })
     .catch (err => {
       next(err);
     });
 });
-
-
-
 
 router.delete('/notes/:id', (req, res, next) => {
   const id = req.params.id;
