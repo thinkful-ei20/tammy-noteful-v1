@@ -155,3 +155,69 @@ describe('POST api/notes', function () {
       });
   });
 });
+
+describe('PUT /api/notes/:id', function () {
+
+  it('should update the note', function () {
+    const updateItem = {
+      'title': 'Hello, I am a new post.',
+      'content' : 'I don\'t have much to say',
+    };
+    return chai.request(app)
+      .put('/api/notes/1005')
+      .send(updateItem)
+      .then(function (res) {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.a('object');
+        expect(res.body).to.include.keys('id', 'title', 'content');
+
+        expect(res.body.id).to.equal(1005);
+        expect(res.body.title).to.equal(updateItem.title);
+        expect(res.body.content).to.equal(updateItem.content);
+      });
+  });
+
+  it('should respond with a 404 for an invalid id', function () {
+    const updateItem = {
+      'title': 'Hello, I am a new post.',
+      'content' : 'I don\'t have much to say',
+    };
+    return chai.request(app)
+      .put('/api/notes/DOESNOTEXIST')
+      .send(updateItem)
+      .catch(err => err.response)
+      .then(res => {
+        expect(res).to.have.status(404);
+      });
+  });
+
+  it('should return an error when missing "title" field', function () {
+    const updateItem = {
+      'content' : 'I don\'t have much to say',
+    };
+    return chai.request(app)
+      .put('/api/notes/1005')
+      .send(updateItem)
+      .catch(err => err.response)
+      .then(res => {
+        expect(res).to.have.status(400);
+        expect(res).to.be.json;
+        expect(res.body).to.be.a('object');
+        expect(res.body.message).to.equal('Missing `title` in request body');
+      });
+  });
+
+});
+
+describe('DELETE  /api/notes/:id', function () {
+
+  it('should delete an item by id', function () {
+    return chai.request(app)
+      .delete('/api/notes/1005')
+      .then(function (res) {
+        expect(res).to.have.status(204);
+      });
+  });
+
+});
